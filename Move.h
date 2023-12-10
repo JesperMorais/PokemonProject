@@ -31,7 +31,7 @@ class physicalMove : public Move {
 public:
     physicalMove(const string& name, const Type type, const int power);
     virtual ~physicalMove() {
-    	cout << "deleted physical move" << endl;
+    
     }
     
     void execute(Pokemon* attacker, Pokemon* defender) const;
@@ -46,7 +46,7 @@ public:
     void execute(Pokemon* attacker, Pokemon* defender) const;
 
 	virtual ~specialMove() {
-		cout << "deleted special move" << endl;
+		
 	}
 };
 

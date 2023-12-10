@@ -9,21 +9,35 @@ int main()
 {
 	try {
 		
-		physicalMove thunderbolt("Thunderbolt", ROCK, 50);
-		specialMove thunder("Thunderstruck", ROCK, 50);
-		physicalMove tackle("Tackle", ROCK, 50);
-		specialMove pickaspeccialle("pickaspeccialle", ROCK, 50);
+		physicalMove thunderbolt("Thunderbolt", ELECTRIC, 20);
+		specialMove thunder("Thunderstruck", ELECTRIC, 10);
+		physicalMove tackle("Tackle", NORMAL, 20);
+		specialMove pickaspeccialle("pickaspeccialle", STEEL, 20);
 		
-		physicalMove rockThrow("RockThrow", ROCK, 50);
-		specialMove rockSlide("RockSlide", ROCK, 50);
-		physicalMove rockSmash("RockSmash", ROCK, 50);
-		specialMove rockBlast("RockBlast", ROCK, 50);
+		physicalMove rockThrow("RockThrow", GROUND, 20);
+		specialMove rockSlide("RockSlide", ROCK, 15);
+		physicalMove rockSmash("RockSmash", ROCK, 30);
+		specialMove rockBlast("RockBlast", ROCK, 10);
 		
-		Pokemon* rockoChard = new Pokemon("RockoChard", ROCK, &rockThrow, &rockSlide, &rockSmash, &rockBlast, 50, 20, 10, 20, 50);
-		Pokemon* testPokemon= new Pokemon("Pikachu", ELECTRIC ,&thunderbolt, &thunder, &tackle, &pickaspeccialle, 50, 20, 10, 20, 50);
+		Pokemon* rockoChard = new Pokemon("RockoChard", GROUND, &rockThrow, &rockSlide, &rockSmash, &rockBlast, 100, 10, 10, 20, 50);
+		Pokemon* Pika= new Pokemon("Pikachu", ELECTRIC ,&thunderbolt, &thunder, &tackle, &pickaspeccialle, 100, 20, 10, 20, 50);
 
-		rockoChard->executeMove1(testPokemon);
-
+		rockoChard->executeMove1(Pika);
+		Pika->executeMove3(rockoChard);
+		rockoChard->executeMove2(Pika);
+		Pika->executeMove4(rockoChard);
+		rockoChard->executeMove3(Pika);
+		Pika->executeMove1(rockoChard);
+		rockoChard->executeMove4(Pika);
+		Pika->executeMove2(rockoChard);
+		rockoChard->executeMove1(Pika);
+		Pika->executeMove3(rockoChard);
+		rockoChard->executeMove2(Pika);
+		Pika->executeMove4(rockoChard);
+		rockoChard->executeMove3(Pika);
+		Pika->executeMove1(rockoChard);
+		
+			
 	}
 	catch (const char* e) {
 		std::cout << e << std::endl;

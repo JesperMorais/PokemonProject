@@ -28,26 +28,45 @@ using namespace std;
 
 
 physicalMove::physicalMove(const string& name, const Type type, const int power)
-	: Move(name, type, power)
-{
-	cout << "made new physical move" << endl;
-}
+	: Move(name, type, power) {}
 
 specialMove::specialMove(const string& name, const Type type, const int power)
-	: Move(name, type, power) {
-	cout << "made new special move" << endl;
-}
+	: Move(name, type, power) {}
 
 
 void physicalMove::execute(Pokemon* attacker, Pokemon* defender) const {
-	defender->reduceHealth(power * (attacker->getAttack() / defender->getDefense()) * defender->calculateDamageMultiplier(physicalMove::type));
+    float baseDamage = power * ((float)attacker->getAttack() / (float)defender->getDefense());
+    float multiplier = defender->calculateDamageMultiplier(physicalMove::type);
+    float damage = baseDamage * multiplier;
 	cout << attacker->getName() << " used " << name << "!" << endl;
-	printEffectivness(defender->calculateDamageMultiplier(physicalMove::type)); //printar effektivness av attacken
+	
+    if (multiplier == 0)
+        cout << "It had no effect" << endl;
+    else if (multiplier < 1.0)
+        cout << "It was not very effective" << endl;
+    else if (multiplier == 1.0)
+        cout << "It was effective" << endl;
+    else if (multiplier > 1.0)
+        cout << "It was super effective" << endl;
+    defender->reduceHealth(damage);
+
+
 }
 
 void specialMove::execute(Pokemon* attacker, Pokemon* defender) const {
-	defender->reduceHealth(power * (attacker->getSpecialAttack() / defender->getSpecialDefense()) * defender->calculateDamageMultiplier(specialMove::type));
-	printEffectivness(defender->calculateDamageMultiplier(specialMove::type)); //printar effektivness av attacken
+    float baseDamage = power * ((float)attacker->getSpecialAttack() / (float)defender->getSpecialDefense());
+    float multiplier = defender->calculateDamageMultiplier(specialMove::type);
+    float damage = baseDamage * multiplier;
+    cout << attacker->getName() << " used " << name << "!" << endl;
+    if (multiplier == 0)
+        cout << "It had no effect" << endl;
+    else if (multiplier < 1.0)
+        cout << "It was not very effective" << endl;
+    else if (multiplier == 1.0)
+        cout << "It was effective" << endl;
+    else if (multiplier > 1.0)
+        cout << "It was super effective" << endl;
+    defender->reduceHealth(damage);
 }
 
 void printEffectivness(float effectivness) { //printar effektivness av attacken

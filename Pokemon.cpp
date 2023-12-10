@@ -53,10 +53,15 @@ Pokemon::Pokemon(const string& name, const Type type, const Move* move1,
 	}
 
 	void Pokemon::reduceHealth(int damage) {
-		health -= damage; //reducerar health med attackens skada      
-		if (health < 0) { //kollar om den är under 0 och sätter den till 0 i så fall
+		health -= damage; //reducerar health med attackens skada   
+		int tempHealth = health+damage;
+		if (health <= 0) { //kollar om den är under 0 och sätter den till 0 i så fall
+
+			cout << name << " had "<<  tempHealth << " health, but took " << damage << " damage" << " and fainted" << endl;
 			health = 0;
-			cout << name << " fainted" << endl;
+		}
+		else if (tempHealth == health) {
+			cout << name << " Health remains the same "<< health << endl;
 		}
 		else
 			cout << name << " health reduced to " << health << endl;
@@ -65,3 +70,21 @@ Pokemon::Pokemon(const string& name, const Type type, const Move* move1,
 	float Pokemon::calculateDamageMultiplier(Type damagetype) {
 		return TypeChart::getDamageMultiplier(damagetype, type); //returnerar skad Miltipliern från en viss typ
 	}
+
+	DualTypePokemon::DualTypePokemon(const string& name, const Type type1, const Type type2, const Move* move1,
+		const Move* move2, const Move* move3, const Move* move4, const int health,
+		const int attack, const int spAttack, const int defense, const int spDefense)
+		: Pokemon(name, type1, move1, move2, move3, move4, health, attack, spAttack, defense, spDefense), type2(type2) 
+	{
+		if (type1 == type2) {
+			throw exception("Types cannot be the same");
+		}
+
+	}
+
+	float DualTypePokemon::calculateDamageMultiplier(Type damagetype) {
+		float multiplier = TypeChart::getDamageMultiplier(damagetype, type);
+		float multiplier2 = TypeChart::getDamageMultiplier(damagetype, type2);
+		return multiplier * multiplier2;
+	}
+

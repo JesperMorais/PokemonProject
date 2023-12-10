@@ -13,18 +13,18 @@ private:
     const Move* move2;
     const Move* move3;
     const Move* move4;
-    
-protected:
-    const Type type;
-    
-
-public:
     const string name;
     int health;
     int attack;
     int spAttack;
     int defense;
     int spDefense;
+    
+protected:
+    const Type type;
+    
+
+public:
     // dessa borde förmodligen inte vara public
 
     Pokemon(const string& name, const Type type, const Move* move1, const Move* move2,
@@ -58,8 +58,18 @@ public:
 
     string getName() const {return name;}
 
-
     void reduceHealth(int damage);
 
     virtual float calculateDamageMultiplier(Type damagetype);
+};
+
+class DualTypePokemon : public Pokemon {
+
+    private:
+	const Type type2;
+
+    public:
+        DualTypePokemon(const string& name, const Type type, const Type type2, const Move* move1, const Move* move2, const Move* move3, const Move* move4, const int health, const int attack, const int spAttack, const int defense, const int spDefense);
+        
+        float calculateDamageMultiplier(Type damagetype);
 };
