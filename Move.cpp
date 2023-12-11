@@ -26,7 +26,6 @@ using namespace std;
         }
     }
 
-
 physicalMove::physicalMove(const string& name, const Type type, const int power)
 	: Move(name, type, power) {}
 
@@ -48,7 +47,7 @@ void physicalMove::execute(Pokemon* attacker, Pokemon* defender) const {
         cout << "It was effective" << endl;
     else if (multiplier > 1.0)
         cout << "It was super effective" << endl;
-    defender->reduceHealth(damage);
+    defender->reduceHealth((int)damage);
 
 
 }
@@ -57,6 +56,7 @@ void specialMove::execute(Pokemon* attacker, Pokemon* defender) const {
     float baseDamage = power * ((float)attacker->getSpecialAttack() / (float)defender->getSpecialDefense());
     float multiplier = defender->calculateDamageMultiplier(specialMove::type);
     float damage = baseDamage * multiplier;
+
     cout << attacker->getName() << " used " << name << "!" << endl;
     if (multiplier == 0)
         cout << "It had no effect" << endl;
@@ -66,14 +66,15 @@ void specialMove::execute(Pokemon* attacker, Pokemon* defender) const {
         cout << "It was effective" << endl;
     else if (multiplier > 1.0)
         cout << "It was super effective" << endl;
-    defender->reduceHealth(damage);
+    defender->reduceHealth((int)damage);
 }
 
-void printEffectivness(float effectivness) { //printar effektivness av attacken
-    if (effectivness == 0.0)
-        cout << "It had no effect" << endl;
-    else if (effectivness < 1.0)
-        cout << "It was not very effective" << endl;
-    else if (effectivness > 1.0)
-        cout << "It was super effective" << endl;
+
+supportMove::supportMove(const string& name, const Type type, const int power)
+    : Move(name, type, power) {};
+
+void supportMove::execute(Pokemon* attacker, Pokemon* defender) {
+    int baseHealing =  attacker->getHealth() * ((float)power / 100);
+    attacker->addHealth(baseHealing);
+
 }

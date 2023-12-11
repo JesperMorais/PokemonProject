@@ -1,16 +1,16 @@
 #pragma once
 #include "Pokemon.h"
 #include <iostream>
-
+#include <ctime>
 using namespace std;
+
 
 	// dessa borde förmodligen inte vara public
 
-Pokemon::Pokemon(const string& name, const Type type, const Move* move1,
-	const Move* move2, const Move* move3, const Move* move4, const int health,
-	const int attack, const int spAttack, const int defense, const int spDefense)
-	: name(name), type(type), move1(move1), move2(move2), move3(move3), move4(move4),
-	health(health), attack(attack), spAttack(spAttack), defense(defense), spDefense(spDefense)
+Pokemon::Pokemon(string& name, const Type type, Move* move1,  Move* move2,
+	 Move* move3, Move* move4, int health, int attack, int spAttack,
+	int defense, int spDefense, int speed, StrategyFunction stratagy)
+	: name(name), type(type), move1(move1), move2(move2), move3(move3), move4(move4), health(health), attack(attack), spAttack(spAttack), defense(defense), spDefense(spDefense), speed(speed), strategy(stratagy)
 {
 	if (name.empty()) {
 		throw exception("Name cannot be empty");
@@ -32,6 +32,9 @@ Pokemon::Pokemon(const string& name, const Type type, const Move* move1,
 	}
 	if (move1 == nullptr || move2 == nullptr || move3 == nullptr || move4 == nullptr) {
 		throw exception("Moves cannot be null");
+	}
+	if (speed <= 0) {
+		throw exception("Speed cannot be less than or equal to 0");
 	}
 }
 
@@ -57,24 +60,29 @@ Pokemon::Pokemon(const string& name, const Type type, const Move* move1,
 		int tempHealth = health+damage;
 		if (health <= 0) { //kollar om den är under 0 och sätter den till 0 i så fall
 
-			cout << name << " had "<<  tempHealth << " health, but took " << damage << " damage" << " and fainted" << endl;
+			cout << name << " had "<<  tempHealth << " health, but took " << damage << " damage" << " and fainted" << endl << endl;
 			health = 0;
 		}
 		else if (tempHealth == health) {
-			cout << name << " Health remains the same "<< health << endl;
+			cout << name << " Health remains the same "<< health << endl << endl;
 		}
 		else
-			cout << name << " health reduced to " << health << endl;
+			cout << name << " health reduced to " << health << endl << endl;
+	}
+
+	void Pokemon::addHealth(int healthAmount) {
+		health += healthAmount;	
 	}
 
 	float Pokemon::calculateDamageMultiplier(Type damagetype) {
 		return TypeChart::getDamageMultiplier(damagetype, type); //returnerar skad Miltipliern från en viss typ
 	}
+	
 
-	DualTypePokemon::DualTypePokemon(const string& name, const Type type1, const Type type2, const Move* move1,
-		const Move* move2, const Move* move3, const Move* move4, const int health,
-		const int attack, const int spAttack, const int defense, const int spDefense)
-		: Pokemon(name, type1, move1, move2, move3, move4, health, attack, spAttack, defense, spDefense), type2(type2) 
+
+
+	DualTypePokemon::DualTypePokemon(string& name, Type type1, Type type2, Move* move1, Move* move2, Move* move3, Move* move4, int health, int attack, int spAttack,int defense,int spDefense,int speed, StrategyFunction strategy)
+		: Pokemon(name, type1, move1, move2, move3, move4, health, attack, spAttack, defense, spDefense, speed, strategy), type2(type2)
 	{
 		if (type1 == type2) {
 			throw exception("Types cannot be the same");
@@ -88,3 +96,164 @@ Pokemon::Pokemon(const string& name, const Type type, const Move* move1,
 		return multiplier * multiplier2;
 	}
 
+
+	PokemonBuilder& PokemonBuilder::addType(Type type) {
+		if (typeList.size() == 2)
+			throw exception("Too many types");
+		typeList.push_back(type);
+		return *this;
+	}
+
+	PokemonBuilder& PokemonBuilder::addMove(Move* move) {
+		if (moveList.size() == 4)
+			throw exception("Too many moves");
+		moveList.push_back(move);
+		return *this;
+	}
+
+	PokemonBuilder& PokemonBuilder::setHealth(int health) {
+		if (health <= 0)
+			throw exception("Health cannot be less than or equal to 0");
+		this->health = health;
+		return *this;
+	}
+
+	PokemonBuilder& PokemonBuilder::setAttack(int attack) {
+		if (attack <= 0)
+			throw exception("Attack cannot be less than or equal to 0");
+		this->attack = attack;
+		return *this;
+	}
+
+	PokemonBuilder& PokemonBuilder::setSpecialAttack(int spAttack) {
+		if (spAttack <= 0)
+			throw exception("Special attack cannot be less than or equal to 0");
+		this->spAttack = spAttack;
+		return *this;
+	}
+
+	PokemonBuilder& PokemonBuilder::setDefense(int defense) {
+		if (defense <= 0)
+			throw exception("Defense cannot be less than or equal to 0");
+		this->defense = defense;
+		return *this;
+	}
+
+	PokemonBuilder& PokemonBuilder::setSpecialDefense(int spDefense) {
+		if (spDefense <= 0)
+			throw exception("Special defense cannot be less than or equal to 0");
+		this->spDefense = spDefense;
+		return *this;
+	}
+
+	PokemonBuilder& PokemonBuilder::setSpeed(int speed) {
+		if (speed <= 0)
+			throw exception("Speed cannot be less than or equal to 0");
+		this->speed = speed;
+		return *this;
+	}
+
+	PokemonBuilder& PokemonBuilder::setName(const string& name) {
+		this->name = name;
+		return *this;
+	}
+
+	PokemonBuilder& PokemonBuilder::setBothAttack(int attack) {
+		if (attack <= 0)
+			throw exception("Attack cannot be less than or equal to 0");
+		this->attack = attack;
+		this->spAttack = attack;
+		return *this;		
+	}
+
+	PokemonBuilder& PokemonBuilder::setBothDefense(int defense) {
+		if (defense <= 0)
+			throw exception("Defense cannot be less than or equal to 0");
+		this->defense = defense;
+		this->spDefense = defense;
+		return *this;
+	}
+
+	Pokemon* PokemonBuilder::build(){
+		if (typeList.size() == 1) {
+			return new Pokemon(name, typeList[0], moveList[0], moveList[1], moveList[2], moveList[3], health, attack, spAttack, defense, spDefense, speed, strategy);
+		}
+		else if (typeList.size() == 2) {
+			return new DualTypePokemon(name, typeList[0], typeList[1], moveList[0], moveList[1], moveList[2], moveList[3], health, attack, spAttack, defense, spDefense, speed, strategy);
+		}
+		else {
+			throw exception("No type added");
+		}
+	}
+
+	PokemonBuilder& PokemonBuilder::setStrategy(StrategyFunction strategy) {
+		this->strategy = strategy;
+		return *this;
+	}
+
+
+	Battle& Battle::addTeamA(Pokemon* pokemon) {
+		if(teamA.size() == 6)
+			throw exception("Too many pokemon in team");
+		teamA.push_back(pokemon);
+		return *this;
+	}
+	
+	Battle& Battle::addTeamB(Pokemon* pokemon) {
+		if(teamB.size() == 6)
+			throw exception("Too many pokemon in team");
+		teamB.push_back(pokemon);
+		return *this;
+	}
+	
+
+	void Battle::start() {
+		int teamAindex=0;
+		int teamBindex=0;
+		int Roundcounter = 0;
+		while(teamA.size() > 0 && teamB.size() > 0) {
+			Pokemon* fastest = moveFirst(teamA[teamAindex], teamB[teamBindex]);
+			Pokemon* slowest = (fastest == teamA[teamAindex]) ? teamB[teamBindex] : teamA[teamAindex];
+
+			Move* move = fastest->strategy(fastest, slowest);
+			Move* move2 = slowest->strategy(slowest, fastest);
+			cout << "Round " << Roundcounter << endl;
+			move->perform(fastest, slowest);
+			
+			if (slowest->getHealth() <= 0) {
+				if (slowest == teamA[teamAindex])
+					teamA.erase(teamA.begin() + teamAindex);
+				else
+					teamB.erase(teamB.begin() + teamBindex);
+			}
+			else
+				move2->perform(slowest, fastest);
+
+			if (fastest->getHealth() <= 0) {
+				if (fastest == teamA[teamAindex])
+					teamA.erase(teamA.begin() + teamAindex);
+				else
+					teamB.erase(teamB.begin() + teamBindex);
+			}
+			Roundcounter++;
+		}
+			if (teamA.size() == 0)
+				cout << "Team B wins!" << endl;
+			else
+				cout << "Team A wins!" << endl;
+		
+	}
+
+	Pokemon* moveFirst(Pokemon* p1, Pokemon* p2) {
+		if (p1->getSpeed() > p2->getSpeed())
+			return p1;
+		else if (p1->getSpeed() < p2->getSpeed())
+			return p2;
+		else {
+			int random = rand() % 2;
+			if (random == 0)
+				return p1;
+			else
+				return p2;
+		}
+	}

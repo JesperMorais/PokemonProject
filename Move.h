@@ -50,4 +50,13 @@ public:
 	}
 };
 
-void printEffectivness(float effectivness);
+class supportMove : public Move {
+    public :
+		supportMove(const string& name, const Type type, const int power);
+
+        void execute(Pokemon* attacker, Pokemon* defender);
+
+        virtual ~supportMove() {
+
+		}
+};

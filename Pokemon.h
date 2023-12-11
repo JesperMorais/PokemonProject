@@ -3,37 +3,40 @@
 #include <string>
 #include "Type.h"
 #include "Move.h"
-
+#include <vector>
+#include <functional>
 using namespace std;
+using StrategyFunction = function<Move* (Pokemon*, Pokemon*)>;
 
 class Pokemon
 {
-private:   
-    const Move* move1;
-    const Move* move2;
-    const Move* move3;
-    const Move* move4;
-    const string name;
+private:
+    
+protected:
+
+public:
+   Move* move1;
+    Move* move2;
+    Move* move3;
+    Move* move4;
+    string name;
     int health;
     int attack;
     int spAttack;
     int defense;
     int spDefense;
-    
-protected:
-    const Type type;
-    
+    int speed;
+    Type type;
+    StrategyFunction strategy;
+    int turnCounter = 0;
 
-public:
-    // dessa borde förmodligen inte vara public
-
-    Pokemon(const string& name, const Type type, const Move* move1, const Move* move2,
-        const Move* move3, const Move* move4, const int health, const int attack, const int spAttack,
-        const int defense, const int spDefense);
+    Pokemon(string& name, Type type, Move* move1, Move* move2,
+        Move* move3, Move* move4,  int health,  int attack,  int spAttack,
+        int defense,  int spDefense, int speed, StrategyFunction strategy);
 
 
     virtual ~Pokemon() {
-        cout << "deleted" << endl;
+        cout << "Pokemon " << name << " had been removed" << endl;
     }
 
     void executeMove1(Pokemon* target);
@@ -43,6 +46,8 @@ public:
     void executeMove3(Pokemon* target);
 
     void executeMove4(Pokemon* target);
+
+    StrategyFunction getStrategy() const {return strategy;}
 
     int getAttack() const {return attack;}
 
@@ -56,11 +61,18 @@ public:
 
     int getHealth() const {return health;}
 
+    int getSpeed() const {return speed;}
+
     string getName() const {return name;}
 
     void reduceHealth(int damage);
 
+    void addHealth(int healthAmount);
+
+    Move* getMove1() const {return move1;}
+
     virtual float calculateDamageMultiplier(Type damagetype);
+
 };
 
 class DualTypePokemon : public Pokemon {
@@ -69,7 +81,61 @@ class DualTypePokemon : public Pokemon {
 	const Type type2;
 
     public:
-        DualTypePokemon(const string& name, const Type type, const Type type2, const Move* move1, const Move* move2, const Move* move3, const Move* move4, const int health, const int attack, const int spAttack, const int defense, const int spDefense);
+        DualTypePokemon(string& name, Type type, Type type2, Move* move1,  Move* move2, Move* move3, Move* move4, int health,  int attack, int spAttack,  int defense, int spDefense, int speed, StrategyFunction strategy);
         
-        float calculateDamageMultiplier(Type damagetype);
+        float calculateDamageMultiplier(Type damagetype) override;
 };
+
+class PokemonBuilder{
+
+private:
+    vector<Type> typeList;
+    vector<Move*> moveList;
+    int health;
+    int attack;
+    int defense;
+    int spAttack;
+    int spDefense;
+    int speed;
+    string name;
+    StrategyFunction strategy;
+
+
+public:
+    PokemonBuilder() {};
+
+    PokemonBuilder& addType(Type type);
+    PokemonBuilder& addMove(Move* move);
+    Pokemon* build();
+    
+    PokemonBuilder& setHealth(const int health);
+    PokemonBuilder& setAttack(const int attack);
+    PokemonBuilder& setDefense(const int defense);
+    PokemonBuilder& setName(const string& name);
+    PokemonBuilder& setSpeed(const int speed);
+    PokemonBuilder& setSpecialAttack(const int spAttack);
+    PokemonBuilder& setSpecialDefense(const int spDefense);
+    PokemonBuilder& setBothAttack(const int spAttack);
+    PokemonBuilder& setBothDefense(const int spDefense);
+    PokemonBuilder& setStrategy(StrategyFunction strat);
+   
+
+};
+
+
+class Battle {
+    vector<Pokemon*> teamA;
+    vector<Pokemon*> teamB;
+
+    public:
+        Battle(){};
+        ~Battle() {
+            //todo delete everything in vectors
+        };
+       
+        Battle& addTeamA(Pokemon* pokemon);
+        Battle& addTeamB(Pokemon* pokemon);
+        void start();
+};
+
+Pokemon* moveFirst(Pokemon* p1, Pokemon* p2);
