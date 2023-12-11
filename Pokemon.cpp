@@ -12,9 +12,6 @@ Pokemon::Pokemon(string& name, const Type type, Move* move1,  Move* move2,
 	int defense, int spDefense, int speed, StrategyFunction stratagy)
 	: name(name), type(type), move1(move1), move2(move2), move3(move3), move4(move4), health(health), attack(attack), spAttack(spAttack), defense(defense), spDefense(spDefense), speed(speed), strategy(stratagy)
 {
-	if (name.empty()) {
-		throw exception("Name cannot be empty");
-	}
 	if (health <= 0) {
 		throw exception("Health cannot be less than or equal to 0");
 	}
@@ -30,14 +27,10 @@ Pokemon::Pokemon(string& name, const Type type, Move* move1,  Move* move2,
 	if (spDefense <= 0) {
 		throw exception("Special defense cannot be less than or equal to 0");
 	}
-	if (move1 == nullptr || move2 == nullptr || move3 == nullptr || move4 == nullptr) {
-		throw exception("Moves cannot be null");
-	}
 	if (speed <= 0) {
 		throw exception("Speed cannot be less than or equal to 0");
 	}
 }
-
 	
 	void Pokemon::executeMove1(Pokemon* target) {
 		move1->perform(this, target);
@@ -77,9 +70,6 @@ Pokemon::Pokemon(string& name, const Type type, Move* move1,  Move* move2,
 	float Pokemon::calculateDamageMultiplier(Type damagetype) {
 		return TypeChart::getDamageMultiplier(damagetype, type); //returnerar skad Miltipliern från en viss typ
 	}
-	
-
-
 
 	DualTypePokemon::DualTypePokemon(string& name, Type type1, Type type2, Move* move1, Move* move2, Move* move3, Move* move4, int health, int attack, int spAttack,int defense,int spDefense,int speed, StrategyFunction strategy)
 		: Pokemon(name, type1, move1, move2, move3, move4, health, attack, spAttack, defense, spDefense, speed, strategy), type2(type2)
@@ -211,12 +201,13 @@ Pokemon::Pokemon(string& name, const Type type, Move* move1,  Move* move2,
 		int teamAindex=0;
 		int teamBindex=0;
 		int Roundcounter = 0;
+
 		while(teamA.size() > 0 && teamB.size() > 0) {
 			Pokemon* fastest = moveFirst(teamA[teamAindex], teamB[teamBindex]);
 			Pokemon* slowest = (fastest == teamA[teamAindex]) ? teamB[teamBindex] : teamA[teamAindex];
 
-			Move* move = fastest->strategy(fastest, slowest);
-			Move* move2 = slowest->strategy(slowest, fastest);
+			Move* move = fastest->getStrategy()(fastest, slowest);
+			Move* move2 = slowest->getStrategy()(slowest, fastest);
 			cout << "Round " << Roundcounter << endl;
 			move->perform(fastest, slowest);
 			

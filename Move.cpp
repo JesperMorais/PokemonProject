@@ -78,3 +78,35 @@ void supportMove::execute(Pokemon* attacker, Pokemon* defender) {
     attacker->addHealth(baseHealing);
 
 }
+
+confusionMove::confusionMove(const string& name, const Type type, const int power)
+    : Move(name, type, power) {};
+
+void confusionMove::execute(Pokemon* attacker, Pokemon* defender) const{
+    float baseDamage = power * ((float)attacker->getSpecialAttack() / (float)defender->getSpecialDefense());
+    float multiplier = defender->calculateDamageMultiplier(type);
+    float damage = baseDamage * multiplier;
+    float selfDamage = damage * 0.25;
+   
+    auto randomChance = []() {
+        return (rand() % 3) == 0; // 1 in 3 chance (33.33%)
+        };
+
+
+    cout << attacker->getName() << " used " << name << "!" << endl;
+    if (multiplier == 0)
+        cout << "It had no effect" << endl;
+    else if (multiplier < 1.0)
+        cout << "It was not very effective" << endl;
+    else if (multiplier == 1.0)
+        cout << "It was effective" << endl;
+    else if (multiplier > 1.0)
+        cout << "It was super effective" << endl;
+    
+    defender->reduceHealth((int)damage);
+
+    if (randomChance() ) {
+        cout << attacker->getName() << " got confused and attacked himself for " << selfDamage << " damage" << endl;
+        attacker->reduceHealth((int)selfDamage);
+        }
+}

@@ -71,6 +71,14 @@ public:
 
     Move* getMove1() const {return move1;}
 
+    Move* getMove2() const {return move2;}
+
+    Move* getMove3() const {return move3;}
+
+    Move* getMove4() const {return move4;}
+
+    
+
     virtual float calculateDamageMultiplier(Type damagetype);
 
 };

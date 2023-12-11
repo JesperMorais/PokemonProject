@@ -34,7 +34,7 @@ public:
     
     }
     
-    void execute(Pokemon* attacker, Pokemon* defender) const;
+    void execute(Pokemon* attacker, Pokemon* defender) const override;
 
 };
 
@@ -43,7 +43,7 @@ class specialMove : public Move {
 public: 
     specialMove(const string& name, const Type type, const int power);
 
-    void execute(Pokemon* attacker, Pokemon* defender) const;
+    void execute(Pokemon* attacker, Pokemon* defender) const override;
 
 	virtual ~specialMove() {
 		
@@ -59,4 +59,16 @@ class supportMove : public Move {
         virtual ~supportMove() {
 
 		}
+};
+
+class confusionMove : public Move {
+	public :
+		confusionMove(const string& name, const Type type, const int power);
+
+		void execute(Pokemon* attacker, Pokemon* defender) const;
+
+        virtual ~confusionMove() {
+
+		}
+private:
 };
