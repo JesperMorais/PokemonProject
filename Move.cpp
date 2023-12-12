@@ -110,3 +110,4 @@ void confusionMove::execute(Pokemon* attacker, Pokemon* defender) const{
         attacker->reduceHealth((int)selfDamage);
         }
 }
+

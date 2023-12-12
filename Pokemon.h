@@ -14,7 +14,6 @@ private:
     
 protected:
 
-public:
    Move* move1;
     Move* move2;
     Move* move3;
@@ -29,6 +28,7 @@ public:
     Type type;
     StrategyFunction strategy;
     int turnCounter = 0;
+public:
 
     Pokemon(string& name, Type type, Move* move1, Move* move2,
         Move* move3, Move* move4,  int health,  int attack,  int spAttack,
