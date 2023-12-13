@@ -2,13 +2,14 @@
 #include "Pokemon.h"
 #include <iostream>
 #include <ctime>
+#include <iomanip>
 using namespace std;
 
 
 	// dessa borde förmodligen inte vara public
 
-Pokemon::Pokemon(string& name, const Type type, Move* move1,  Move* move2,
-	 Move* move3, Move* move4, int health, int attack, int spAttack,
+Pokemon::Pokemon(string& name, const Type type, const Move* move1, const Move* move2,
+	const Move* move3, const Move* move4, int health, int attack, int spAttack,
 	int defense, int spDefense, int speed, StrategyFunction stratagy)
 	: name(name), type(type), move1(move1), move2(move2), move3(move3), move4(move4), health(health), attack(attack), spAttack(spAttack), defense(defense), spDefense(spDefense), speed(speed), strategy(stratagy)
 {
@@ -67,11 +68,15 @@ Pokemon::Pokemon(string& name, const Type type, Move* move1,  Move* move2,
 		health += healthAmount;	
 	}
 
+	void Pokemon::buffDefense(int buffAmount) {
+		defense += buffAmount;
+	}
+
 	float Pokemon::calculateDamageMultiplier(Type damagetype) {
 		return TypeChart::getDamageMultiplier(damagetype, type); //returnerar skad Miltipliern från en viss typ
 	}
 
-	DualTypePokemon::DualTypePokemon(string& name, Type type1, Type type2, Move* move1, Move* move2, Move* move3, Move* move4, int health, int attack, int spAttack,int defense,int spDefense,int speed, StrategyFunction strategy)
+	DualTypePokemon::DualTypePokemon(string& name, Type type1, Type type2, const Move* move1, const Move* move2, const Move* move3, const  Move* move4, int health, int attack, int spAttack,int defense,int spDefense,int speed, StrategyFunction strategy)
 		: Pokemon(name, type1, move1, move2, move3, move4, health, attack, spAttack, defense, spDefense, speed, strategy), type2(type2)
 	{
 		if (type1 == type2) {
@@ -88,14 +93,14 @@ Pokemon::Pokemon(string& name, const Type type, Move* move1,  Move* move2,
 
 
 	PokemonBuilder& PokemonBuilder::addType(Type type) {
-		if (typeList.size() == 2)
+		if (typeList.size() >= 2)
 			throw exception("Too many types");
 		typeList.push_back(type);
 		return *this;
 	}
 
 	PokemonBuilder& PokemonBuilder::addMove(Move* move) {
-		if (moveList.size() == 4)
+		if (moveList.size() >= 4)
 			throw exception("Too many moves");
 		moveList.push_back(move);
 		return *this;
@@ -202,33 +207,47 @@ Pokemon::Pokemon(string& name, const Type type, Move* move1,  Move* move2,
 		int teamBindex=0;
 		int Roundcounter = 0;
 
-		while(teamA.size() > 0 && teamB.size() > 0) {
+		while(teamA.size() > teamAindex && teamB.size() > teamBindex) {
+			
 			Pokemon* fastest = moveFirst(teamA[teamAindex], teamB[teamBindex]);
 			Pokemon* slowest = (fastest == teamA[teamAindex]) ? teamB[teamBindex] : teamA[teamAindex];
 
-			Move* move = fastest->getStrategy()(fastest, slowest);
-			Move* move2 = slowest->getStrategy()(slowest, fastest);
+			const Move* move = fastest->getStrategy()(fastest, slowest);
+			const Move* move2 = slowest->getStrategy()(slowest, fastest);
 			cout << "Round " << Roundcounter << endl;
-			move->perform(fastest, slowest);
 			
-			if (slowest->getHealth() <= 0) {
-				if (slowest == teamA[teamAindex])
-					teamA.erase(teamA.begin() + teamAindex);
-				else
-					teamB.erase(teamB.begin() + teamBindex);
+			move->perform(fastest, slowest); //fastest attackerar
+			
+			if (slowest->getHealth() <= 0) { //Kollar om slowest dör
+				if (slowest == teamA[teamAindex]) {
+					teamAindex++;
+					if(teamAindex < teamA.size())
+						cout << teamA[teamAindex]->getName() << " has joined the battle!" << endl << endl;
+				}
+				else {				
+					teamBindex++;
+						if(teamBindex < teamB.size())
+							cout << teamB[teamBindex]->getName() << " has joined the battle!" << endl << endl;
+				}
 			}
 			else
-				move2->perform(slowest, fastest);
+				move2->perform(slowest, fastest); //slowest attackerar
 
 			if (fastest->getHealth() <= 0) {
-				if (fastest == teamA[teamAindex])
-					teamA.erase(teamA.begin() + teamAindex);
-				else
-					teamB.erase(teamB.begin() + teamBindex);
+				if (fastest == teamA[teamAindex]) {
+					teamAindex++;
+					if (teamAindex < teamA.size())
+						cout << teamA[teamAindex]->getName() << " has joined the battle!" <<  endl << endl;
+				}
+				else {
+					teamBindex;
+						if(teamBindex < teamB.size())
+							cout << teamB[teamBindex]->getName() << " has joined the battle!" << endl << endl;
+				}
 			}
 			Roundcounter++;
 		}
-			if (teamA.size() == 0)
+			if (teamA.size() < teamAindex)
 				cout << "Team B wins!" << endl;
 			else
 				cout << "Team A wins!" << endl;

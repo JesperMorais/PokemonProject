@@ -54,7 +54,7 @@ class supportMove : public Move {
     public :
 		supportMove(const string& name, const Type type, const int power);
 
-        void execute(Pokemon* attacker, Pokemon* defender);
+        void execute(Pokemon* attacker, Pokemon* defender) const override;
 
         virtual ~supportMove() {
 
@@ -65,10 +65,20 @@ class confusionMove : public Move {
 	public :
 		confusionMove(const string& name, const Type type, const int power);
 
-		void execute(Pokemon* attacker, Pokemon* defender) const;
+		void execute(Pokemon* attacker, Pokemon* defender) const override;
 
         virtual ~confusionMove() {
 
 		}
-private:
+};
+
+
+class DefenseBuffMove : public Move {
+public:
+    DefenseBuffMove(const string& name, const Type type, const int power);
+
+	void execute(Pokemon* attacker, Pokemon* defender) const override;
+
+    virtual ~DefenseBuffMove() {
+	}
 };

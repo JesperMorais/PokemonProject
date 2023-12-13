@@ -73,10 +73,10 @@ void specialMove::execute(Pokemon* attacker, Pokemon* defender) const {
 supportMove::supportMove(const string& name, const Type type, const int power)
     : Move(name, type, power) {};
 
-void supportMove::execute(Pokemon* attacker, Pokemon* defender) {
+void supportMove::execute(Pokemon* attacker, Pokemon* defender)const {
     int baseHealing =  attacker->getHealth() * ((float)power / 100);
     attacker->addHealth(baseHealing);
-
+    cout << attacker->getName() << " used " << name << " and healed " << baseHealing << " health!" << endl << endl;
 }
 
 confusionMove::confusionMove(const string& name, const Type type, const int power)
@@ -103,11 +103,19 @@ void confusionMove::execute(Pokemon* attacker, Pokemon* defender) const{
     else if (multiplier > 1.0)
         cout << "It was super effective" << endl;
     
-    defender->reduceHealth((int)damage);
+    defender->reduceHealth(damage);
 
-    if (randomChance() ) {
+    if (randomChance()) {
         cout << attacker->getName() << " got confused and attacked himself for " << selfDamage << " damage" << endl;
         attacker->reduceHealth((int)selfDamage);
         }
 }
 
+DefenseBuffMove::DefenseBuffMove(const string& name, const Type type, const int power)
+	: Move(name, type, power) {};
+
+void DefenseBuffMove::execute(Pokemon* attacker, Pokemon* defender) const{
+    int buffmount = (attacker->getDefense() * power) / 100;
+    attacker->buffDefense(buffmount);
+    cout << attacker->getName() << " used " << name << " and got "<< buffmount << " extra defens for the rest of the battle!" << endl;
+}

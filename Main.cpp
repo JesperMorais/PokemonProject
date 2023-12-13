@@ -5,13 +5,23 @@
 #include "Move.h"
 using namespace std;
 
-//Fixa så att heal inte kan användas så ofta
-//protected KANSKE
-//SelfDamage abilties
-//dubbelDamage / crit
 
-Move* simpleStrategy(Pokemon* attacker, Pokemon* defender) {
-	return attacker->getMove1();
+const Move* StratagyOne(Pokemon* attacker, Pokemon* defender) {
+	static bool hasUsedDefensivAbiltie = false; //så vi endast kan köra defensiv abltie 1 gång.
+
+	if (attacker->getHealth() <= 30 && hasUsedDefensivAbiltie == false) 
+	{
+		hasUsedDefensivAbiltie = true;
+		return attacker->getMove1(); //skall vara en buff move av något slag
+	}
+	else if (defender->getHealth() > 30)
+	{
+		return attacker->getMove2();
+	}
+	else
+	{
+		return attacker->getMove3();
+	}
 }
 
 
@@ -20,22 +30,22 @@ int main()
 {
 	try {
 
-		physicalMove thunderbolt("Thunderbolt", ELECTRIC, 20);
+		DefenseBuffMove thunderShield("thunderShield", ELECTRIC, 20);
 		confusionMove thunder("ThunderstruckConfusion", ELECTRIC, 10);
 		physicalMove tackle("Tackle", NORMAL, 20);
 		specialMove pickaspeccialle("pickaspeccialle", STEEL, 20);
 
-		confusionMove rockThrow("RockThrow", GROUND, 20);
+		supportMove rockJuice("rockJuice", GROUND, 10);
 		specialMove rockSlide("RockSlide", ROCK, 15);
 		physicalMove rockSmash("RockSmash", ROCK, 30);
 		specialMove rockBlast("RockBlast", ROCK, 10);
 
 		confusionMove confusion("Confusion", PSYCHIC, 10);
-		specialMove firebeam("Psybeam", FIRE, 15);
+		DefenseBuffMove fireShield("fireShield", FIRE, 15);
 		physicalMove tackle2("Tackle", NORMAL, 20);
 		specialMove fireblast("Fireblast", FIRE, 10);
 
-		specialMove solarBeam("Solar Beam", GRASS, 30);
+		supportMove solarHeal("Solar Heal", GRASS, 30);
 		physicalMove bite("Bite", DARK, 20);
 		specialMove blizzard("Blizzard", ICE, 25);
 		physicalMove flamethrower("Flamethrower", FIRE, 25);
@@ -53,7 +63,7 @@ int main()
 		Pokemon* Pika = PokemonBuilder()
 			.setName("Pikachu")
 			.addType(ELECTRIC)
-			.addMove(&thunderbolt)
+			.addMove(&thunderShield)
 			.addMove(&thunder)
 			.addMove(&tackle)
 			.addMove(&pickaspeccialle)
@@ -63,14 +73,14 @@ int main()
 			.setDefense(20)
 			.setSpecialDefense(50)
 			.setSpeed(5)
-			.setStrategy(simpleStrategy)
+			.setStrategy(StratagyOne)
 			.build();
 
 		DualTypePokemon* rockoChard = (DualTypePokemon*)PokemonBuilder()
 			.setName("RockoChard")
 			.addType(GROUND)
 			.addType(ROCK)
-			.addMove(&rockThrow)
+			.addMove(&rockJuice)
 			.addMove(&rockSlide)
 			.addMove(&rockSmash)
 			.addMove(&rockBlast)
@@ -80,14 +90,14 @@ int main()
 			.setDefense(20)
 			.setSpecialDefense(50)
 			.setSpeed(4)
-			.setStrategy(&simpleStrategy)
+			.setStrategy(&StratagyOne)
 			.build();
 
 
 		Pokemon* charmander = PokemonBuilder()
 			.setName("Charmander")
 			.addType(FIRE)
-			.addMove(&firebeam)
+			.addMove(&fireShield)
 			.addMove(&confusion)
 			.addMove(&fireblast)
 			.addMove(&tackle)
@@ -97,13 +107,14 @@ int main()
 			.setDefense(20)
 			.setSpecialDefense(50)
 			.setSpeed(4)
-			.setStrategy(&simpleStrategy)
+			.setStrategy(&StratagyOne)
 			.build();
+		
 		Pokemon* bulbasaur = PokemonBuilder()
 			.setName("Bulbasaur")
 			.addType(GRASS)
 			.addType(POISON)
-			.addMove(&solarBeam)
+			.addMove(&solarHeal)
 			.addMove(&bite)
 			.addMove(&blizzard)
 			.addMove(&flamethrower)
@@ -113,7 +124,7 @@ int main()
 			.setDefense(20)
 			.setSpecialDefense(50)
 			.setSpeed(4)
-			.setStrategy(&simpleStrategy)
+			.setStrategy(&StratagyOne)
 			.build();
 
 	
@@ -126,6 +137,7 @@ int main()
 			.addTeamA(bulbasaur)
 			.start();
 
+		//Ta bort alla moves?
 	}
 	catch (const char* e) {
 		std::cout << e << std::endl;

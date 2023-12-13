@@ -6,7 +6,7 @@
 #include <vector>
 #include <functional>
 using namespace std;
-using StrategyFunction = function<Move* (Pokemon*, Pokemon*)>;
+using StrategyFunction = function<const Move* (Pokemon*, Pokemon*)>;
 
 class Pokemon
 {
@@ -14,10 +14,10 @@ private:
     
 protected:
 
-   Move* move1;
-    Move* move2;
-    Move* move3;
-    Move* move4;
+    const Move* move1;
+    const Move* move2;
+    const Move* move3;
+    const Move* move4;
     string name;
     int health;
     int attack;
@@ -25,13 +25,13 @@ protected:
     int defense;
     int spDefense;
     int speed;
-    Type type;
+    const Type type;
     StrategyFunction strategy;
     int turnCounter = 0;
 public:
 
-    Pokemon(string& name, Type type, Move* move1, Move* move2,
-        Move* move3, Move* move4,  int health,  int attack,  int spAttack,
+    Pokemon(string& name, const Type type, const Move* move1, const Move* move2,
+        const Move* move3, const Move* move4,  int health,  int attack,  int spAttack,
         int defense,  int spDefense, int speed, StrategyFunction strategy);
 
 
@@ -47,21 +47,21 @@ public:
 
     void executeMove4(Pokemon* target);
 
-    StrategyFunction getStrategy() const {return strategy;}
+    const StrategyFunction getStrategy() const {return strategy;}
 
-    int getAttack() const {return attack;}
+    const int getAttack() const {return attack;}
 
-    int getDefense() const {return defense;}
+    const int getDefense() const {return defense;}
 
-	Type getType() const {return type;}
+	const Type getType() const {return type;}
 
-	int getSpecialAttack() const {return spAttack;}
+    const int getSpecialAttack() const {return spAttack;}
+    
+    const int getSpecialDefense() const {return spDefense;}
 
-	int getSpecialDefense() const {return spDefense;}
+    const int getHealth() const {return health;}
 
-    int getHealth() const {return health;}
-
-    int getSpeed() const {return speed;}
+    const int getSpeed() const {return speed;}
 
     string getName() const {return name;}
 
@@ -69,13 +69,15 @@ public:
 
     void addHealth(int healthAmount);
 
-    Move* getMove1() const {return move1;}
+    void buffDefense(int buffAmount);
 
-    Move* getMove2() const {return move2;}
+    const Move* getMove1() const {return move1;}
 
-    Move* getMove3() const {return move3;}
+    const Move* getMove2() const {return move2;}
 
-    Move* getMove4() const {return move4;}
+    const Move* getMove3() const {return move3;}
+
+    const Move* getMove4() const {return move4;}
 
     
 
@@ -89,16 +91,16 @@ class DualTypePokemon : public Pokemon {
 	const Type type2;
 
     public:
-        DualTypePokemon(string& name, Type type, Type type2, Move* move1,  Move* move2, Move* move3, Move* move4, int health,  int attack, int spAttack,  int defense, int spDefense, int speed, StrategyFunction strategy);
+        DualTypePokemon(string& name, const Type type, const Type type2, const Move* move1, const Move* move2, const Move* move3, const Move* move4, int health,  int attack, int spAttack,  int defense, int spDefense, int speed, StrategyFunction strategy);
         
-        float calculateDamageMultiplier(Type damagetype) override;
+        float calculateDamageMultiplier(const Type damagetype) override;
 };
 
 class PokemonBuilder{
 
 private:
     vector<Type> typeList;
-    vector<Move*> moveList;
+    vector<const Move*> moveList;
     int health;
     int attack;
     int defense;
@@ -112,7 +114,7 @@ private:
 public:
     PokemonBuilder() {};
 
-    PokemonBuilder& addType(Type type);
+    PokemonBuilder& addType(const Type type);
     PokemonBuilder& addMove(Move* move);
     Pokemon* build();
     
@@ -126,7 +128,6 @@ public:
     PokemonBuilder& setBothAttack(const int spAttack);
     PokemonBuilder& setBothDefense(const int spDefense);
     PokemonBuilder& setStrategy(StrategyFunction strat);
-   
 
 };
 
@@ -138,9 +139,14 @@ class Battle {
     public:
         Battle(){};
         ~Battle() {
-            //todo delete everything in vectors
-        };
-       
+            for (Pokemon* pokemon : teamA) {
+                delete pokemon;
+            }
+            for (Pokemon* pokemon : teamB) {
+                delete pokemon;
+            }
+        }
+
         Battle& addTeamA(Pokemon* pokemon);
         Battle& addTeamB(Pokemon* pokemon);
         void start();
